@@ -1,5 +1,5 @@
 properties([buildDiscarder(logRotator(daysToKeepStr: '15'))])
-buildDockerAndPublishImage('account-app', [
+buildDockerAndPublishImage('geoipupdate', [
     rebuildImageOnPeriodicJob: false,
     automaticSemanticVersioning: true,
     targetplatforms: 'linux/amd64,linux/arm64',
