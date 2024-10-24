@@ -1,0 +1,8 @@
+= Docker Image for Jenkins Mirrorbits geoip
+
+This repository hosts the resources to build a Docker Image used for updating the geoip databases regularly without hiting the rate limits
+
+== Contribute
+
+If you want to contribute, or build/test the Docker Image, please refer to the following documentation about Docker images for the Jenkins Infra project:
+link:https://github.com/jenkins-infra/pipeline-library/blob/master/resources/io/jenkins/infra/docker/README.adoc[README]

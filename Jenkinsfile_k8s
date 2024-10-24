@@ -1,0 +1,2 @@
+properties([buildDiscarder(logRotator(daysToKeepStr: '15'))])
+parallelDockerUpdatecli([imageName: 'customgeoipupdate', rebuildImageOnPeriodicJob: false, , updatecliConfig: [containerMemory: '1G'], buildDockerConfig : [targetplatforms: 'linux/amd64,linux/arm64']])
