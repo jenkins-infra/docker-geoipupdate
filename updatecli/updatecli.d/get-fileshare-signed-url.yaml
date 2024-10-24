@@ -1,0 +1,39 @@
+---
+name: Keep `get-fileshare-signed-url.sh` up to date
+
+scms:
+  default:
+    kind: github
+    spec:
+      user: "{{ .github.user }}"
+      email: "{{ .github.email }}"
+      owner: "{{ .github.owner }}"
+      repository: "{{ .github.repository }}"
+      token: "{{ requiredEnv .github.token }}"
+      username: "{{ .github.username }}"
+      branch: "{{ .github.branch }}"
+
+sources:
+  latestVersion:
+    name: Get latest get-fileshare-signed-url.sh version
+    kind: file
+    spec:
+      file: https://raw.githubusercontent.com/jenkins-infra/pipeline-library/refs/heads/master/resources/get-fileshare-signed-url.sh
+
+targets:
+  update-get-fileshare-signed-url:
+    name: Update `get-fileshare-signed-url.sh` file
+    sourceid: latestVersion
+    kind: file
+    spec:
+      file: ./get-fileshare-signed-url.sh
+    scmid: default
+
+actions:
+  default:
+    kind: github/pullrequest
+    scmid: default
+    title: Update `get-fileshare-signed-url.sh` file
+    spec:
+      labels:
+        - dependencies
