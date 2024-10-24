@@ -35,7 +35,7 @@ RUN mkdir -p /etc/apt/keyrings && \
     apt-get update && apt-get install azure-cli=${AZ_VERSION}-1~${AZ_DIST} && apt-get clean
 
 # GEOIPUPDATE INSTALL
-ARG GEOIPUPDATE_VERSION
+ARG GEOIPUPDATE_VERSION=v7.0.1
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN ARCH="$(uname -m)" && \
     if [ "$ARCH" = "x86_64" ]; then \
