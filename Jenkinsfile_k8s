@@ -1,2 +1,9 @@
 properties([buildDiscarder(logRotator(daysToKeepStr: '15'))])
-parallelDockerUpdatecli([imageName: 'customgeoipupdate', rebuildImageOnPeriodicJob: false, , updatecliConfig: [containerMemory: '1G'], buildDockerConfig : [targetplatforms: 'linux/amd64,linux/arm64']])
+// buildDockerAndPublishImage('geoipupdate', [
+//     rebuildImageOnPeriodicJob: false,
+//     automaticSemanticVersioning: true,
+//     targetplatforms: 'linux/amd64,linux/arm64',
+//     disablePublication: !infra.isInfra()
+// ])
+
+parallelDockerUpdatecli([imageName: 'geoipupdate', rebuildImageOnPeriodicJob: false, , updatecliConfig: [containerMemory: '1G'], buildDockerConfig : [targetplatforms: 'linux/amd64,linux/arm64']])
