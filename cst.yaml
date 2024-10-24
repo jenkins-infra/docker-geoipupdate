@@ -1,0 +1,14 @@
+schemaVersion: 2.0.0
+commandTests:
+  - name: "Check azcopy Version"
+    command: "azcopy"
+    args: ["--version"]
+    expectedOutput: ["azcopy version 10.26.0"]
+  - name: "Check geoipupdate Version"
+    command: "geoipupdate"
+    args: ["--version"]
+    expectedError: ["geoipupdate 7.0.1"]
+  - name: "Check az Version"
+    command: "az"
+    args: ["--version"]
+    expectedOutput: ["azure-cli                         2.51.0"]
