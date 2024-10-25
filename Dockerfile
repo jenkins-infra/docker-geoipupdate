@@ -4,6 +4,7 @@ ARG AZ_VERSION=2.51.0
 
 
 FROM ubuntu:22.04
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends wget ca-certificates gnupg lsb-release\
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -32,7 +33,7 @@ RUN mkdir -p /etc/apt/keyrings && \
     chmod go+r /etc/apt/keyrings/microsoft.gpg && \
     AZ_DIST="$(lsb_release -cs)" && \
     printf 'Types: deb\nURIs: https://packages.microsoft.com/repos/azure-cli/\nSuites: %s\nComponents: main\nArchitectures: %s\nSigned-by: /etc/apt/keyrings/microsoft.gpg' "${AZ_DIST}" "$(dpkg --print-architecture)" | tee /etc/apt/sources.list.d/azure-cli.sources && \
-    apt-get update && apt-get install azure-cli=${AZ_VERSION}-1~${AZ_DIST} && apt-get clean
+    apt-get update && apt-get install -y --no-install-recommends azure-cli=${AZ_VERSION}-1~${AZ_DIST} && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # GEOIPUPDATE INSTALL
 ARG GEOIPUPDATE_VERSION
