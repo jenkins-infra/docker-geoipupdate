@@ -47,7 +47,7 @@ RUN ARCH="$(uname -m)" && \
         echo "Unsupported architecture: $ARCH" && exit 1; \
     fi \
 && wget -qO- "${DOWNLOAD_URL}" -O /tmp/geoipupdate.tgz \
-&& BIN_LOCATION=$(tar -tzf /tmp/geoipupdate.tgz | grep "/geoipupdate") \
+&& BIN_LOCATION=$(tar -tzf /tmp/geoipupdate.tgz | grep "/geoipupdate$") \
 && export BIN_LOCATION \
 && tar -xvzf /tmp/geoipupdate.tgz --strip-components=1 --directory=/usr/bin/ "$BIN_LOCATION" \
 && chown root:root /usr/bin/geoipupdate \
