@@ -6,8 +6,6 @@ set +x
 
 GEOIPUPDATE_DB_DIR="$(mktemp -d)"
 export GEOIPUPDATE_DB_DIR
-export GEOIPUPDATE_FREQUENCY=0
-export GEOIPUPDATE_EDITION_IDS="GeoLite2-ASN GeoLite2-City GeoLite2-Country"
 export log_file="/var/log/geoipupdater.log"
 
 if [ -z "$GEOIPUPDATE_ACCOUNT_ID" ] && [ -z  "$GEOIPUPDATE_ACCOUNT_ID_FILE" ]; then
@@ -21,8 +19,11 @@ if [ -z "$GEOIPUPDATE_LICENSE_KEY" ] && [ -z  "$GEOIPUPDATE_LICENSE_KEY_FILE" ];
 fi
 
 if [ -z "$GEOIPUPDATE_EDITION_IDS" ]; then
-    echo "ERROR: You must set the environment variable GEOIPUPDATE_EDITION_IDS!"
-    exit 1
+    GEOIPUPDATE_EDITION_IDS="GeoLite2-ASN GeoLite2-City GeoLite2-Country"
+fi
+
+if [ -z "$GEOIPUPDATE_FREQUENCY" ]; then
+    GEOIPUPDATE_FREQUENCY=0
 fi
 
 if [ -z "$JENKINS_INFRA_FILESHARE_CLIENT_ID" ]; then
@@ -46,14 +47,22 @@ echo "LAUNCH GEOIP UPDATE"
 echo "UPDATE DONE"
 
 ### AZCOPY
+
+if [ -z "$STORAGE_NAME" ]; then
+    echo "ERROR: You must set the environment variable STORAGE_NAME!"
+    exit 1
+fi
+
+if [ -z "$STORAGE_FILESHARE" ]; then
+    echo "ERROR: You must set the environment variable STORAGE_FILESHARE!"
+    exit 1
+fi
+
 echo "LAUNCH AZCOPY"
 echo "azure token"
-export STORAGE_NAME="publick8spvdata"
-export STORAGE_FILESHARE="geoip-data"
 export STORAGE_DURATION_IN_MINUTE=5
 export STORAGE_PERMISSIONS=dlrw
 
-# Required variables that should be set useless as checked upper
 fileShareSignedUrl="$(get-fileshare-signed-url.sh)"
 
 echo "azcopy copy"
