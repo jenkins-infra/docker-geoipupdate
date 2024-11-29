@@ -6,7 +6,6 @@ set +x
 
 GEOIPUPDATE_DB_DIR="$(mktemp -d)"
 export GEOIPUPDATE_DB_DIR
-export log_file="/var/log/geoipupdater.log"
 
 if [ -z "$GEOIPUPDATE_ACCOUNT_ID" ] && [ -z  "$GEOIPUPDATE_ACCOUNT_ID_FILE" ]; then
     echo "ERROR: You must set the environment variable GEOIPUPDATE_ACCOUNT_ID or GEOIPUPDATE_ACCOUNT_ID_FILE!"
@@ -43,7 +42,7 @@ fi
 
 ### GEOUPDATEIP
 echo "LAUNCH GEOIP UPDATE"
-/usr/bin/geoipupdate --verbose --output --database-directory="${GEOIPUPDATE_DB_DIR}" 1>$log_file
+/usr/bin/geoipupdate --verbose --output --database-directory="${GEOIPUPDATE_DB_DIR}"
 echo "UPDATE DONE"
 
 ### AZCOPY
