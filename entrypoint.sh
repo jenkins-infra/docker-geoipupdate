@@ -1,8 +1,6 @@
 #!/bin/bash
 
-set -eu -o pipefail
-# Don't print any trace
-set +x
+set -Eeux -o pipefail
 
 GEOIPUPDATE_DB_DIR="$(mktemp -d)"
 export GEOIPUPDATE_DB_DIR
@@ -65,10 +63,14 @@ export STORAGE_PERMISSIONS=dlrw
 fileShareSignedUrl="$(get-fileshare-signed-url.sh)"
 
 echo "azcopy copy"
+AZCOPY_LOG_LOCATION="$(mktemp -d)"
+set +e #do not failfast on error for azcopy
 azcopy copy \
     --skip-version-check `# Do not check for new azcopy versions (we have updatecli + puppet for this)` \
     --log-level=ERROR `# Do not write too much logs (I/O...)` \
-    "${GEOIPUPDATE_DB_DIR}/*.mmdb" "${fileShareSignedUrl}"
+    "${GEOIPUPDATE_DB_DIR}/*.mmdb" "${fileShareSignedUrl}" \
+|| \
+    cat "${AZCOPY_LOG_LOCATION}/.azcopy/*" #dump the logs in case of error during azcopy copy
 
 echo "azcopy list"
 azcopy list "${fileShareSignedUrl}"

@@ -10,6 +10,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends wget ca-certifi
 
 # AZCOPY INSTALL
 ARG AZCOPY_VERSION
+ARG user=azcopy
+ARG group=azcopy
+ARG uid=1000
+ARG gid=1000
+ARG user_home="/home/${user}"
+RUN groupadd -g ${gid} ${group} \
+    && useradd -l -d "${user_home}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN ARCH="$(uname -m)" && \
     if [ "$ARCH" = "x86_64" ]; then \
@@ -23,7 +31,7 @@ RUN ARCH="$(uname -m)" && \
 && BIN_LOCATION="$(tar -tzf /tmp/azcopy.tgz | grep "/azcopy")" \
 && export BIN_LOCATION \
 && tar -xvzf /tmp/azcopy.tgz --strip-components=1 --directory=/usr/bin/ "$BIN_LOCATION" \
-&& chown root:root /usr/bin/azcopy \
+&& chown "${user}:${user}" /usr/bin/azcopy \
 && chmod +x /usr/bin/azcopy
 
 # AZ INSTALL
@@ -50,8 +58,10 @@ RUN ARCH="$(uname -m)" && \
 && BIN_LOCATION=$(tar -tzf /tmp/geoipupdate.tgz | grep "/geoipupdate$") \
 && export BIN_LOCATION \
 && tar -xvzf /tmp/geoipupdate.tgz --strip-components=1 --directory=/usr/bin/ "$BIN_LOCATION" \
-&& chown root:root /usr/bin/geoipupdate \
+&& chown "${user}:${user}" /usr/bin/geoipupdate \
 && chmod +x /usr/bin/geoipupdate
+
+USER "${user}"
 
 # TODO updatecli https://github.com/jenkins-infra/packer-images/blob/main/updatecli/updatecli.d/get-fileshare-signed-url.yml
 COPY get-fileshare-signed-url.sh /usr/bin/get-fileshare-signed-url.sh
