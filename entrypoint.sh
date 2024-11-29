@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeux -o pipefail
+set -Eeu -o pipefail
 
 GEOIPUPDATE_DB_DIR="$(mktemp -d)"
 export GEOIPUPDATE_DB_DIR
@@ -40,7 +40,14 @@ fi
 
 ### GEOUPDATEIP
 echo "LAUNCH GEOIP UPDATE"
-/usr/bin/geoipupdate --verbose --output --database-directory="${GEOIPUPDATE_DB_DIR}"
+if [ "${GEOIPUPDATE_DRYRUN-default}" == "default" ]; then #if GEOIPUPDATE_DRYRUN is not set
+    /usr/bin/geoipupdate --verbose --output --database-directory="${GEOIPUPDATE_DB_DIR}"
+else
+    echo "DRY MODE ON" #if GEOIPUPDATE_DRYRUN is set
+    [[ "$(uname  || true)" == "Darwin" ]] && dateCmd="gdate" || dateCmd="date"
+    currentUTCdatetime="$("${dateCmd}" --utc +"%Y%m%dT%H%MZ")"
+    echo "drymode" >"${GEOIPUPDATE_DB_DIR}/dryrun-${currentUTCdatetime}.mmdb"
+fi
 echo "UPDATE DONE"
 
 ### AZCOPY
@@ -63,7 +70,11 @@ export STORAGE_PERMISSIONS=dlrw
 fileShareSignedUrl="$(get-fileshare-signed-url.sh)"
 
 echo "azcopy copy"
-AZCOPY_LOG_LOCATION="$(mktemp -d)"
+AZCOPY_FOLDER="$(mktemp -d)"
+AZCOPY_LOG_LOCATION="${AZCOPY_FOLDER}"
+AZCOPY_JOB_PLAN_LOCATION="${AZCOPY_FOLDER}"
+export AZCOPY_LOG_LOCATION
+export AZCOPY_JOB_PLAN_LOCATION
 set +e #do not failfast on error for azcopy
 azcopy copy \
     --skip-version-check `# Do not check for new azcopy versions (we have updatecli + puppet for this)` \
@@ -73,7 +84,9 @@ azcopy copy \
     cat "${AZCOPY_LOG_LOCATION}/.azcopy/*" #dump the logs in case of error during azcopy copy
 
 echo "azcopy list"
-azcopy list "${fileShareSignedUrl}"
+azcopy list \
+    --skip-version-check `# Do not check for new azcopy versions (we have updatecli + puppet for this)` \
+    "${fileShareSignedUrl}"
 
 echo "AZCOPY DONE"
 
