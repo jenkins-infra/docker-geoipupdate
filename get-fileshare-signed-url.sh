@@ -22,7 +22,7 @@
 # - JENKINS_INFRA_FILESHARE_CLIENT_SECRET: the service principal client secret
 # - JENKINS_INFRA_FILESHARE_TENANT_ID: the file share tenant id
 # --------------------------------------------------------------------------------
-set -eu -o pipefail
+set -Eeu -o pipefail
 
 # Don't print any trace
 set +x
@@ -54,6 +54,7 @@ fi
 # date(1) isn't GNU compliant on MacOS, using gdate(1) in that case
 [[ "$(uname  || true)" == "Darwin" ]] && dateCmd="gdate" || dateCmd="date"
 expiry="$("${dateCmd}" --utc --date "+ ${STORAGE_DURATION_IN_MINUTE} minutes" +"%Y-%m-%dT%H:%MZ")"
+
 
 # Generate a SAS token, remove double quotes around it and replace potential '/' by '%2F'
 token="$(az storage share generate-sas "${accountKeyArg[@]}" \
