@@ -1,4 +1,38 @@
 schemaVersion: 2.0.0
+metadataTest:
+  entrypoint: ["/usr/bin/entrypoint.sh"]
+  user: azcopy
+fileExistenceTests:
+  - name: "azcopy"
+    path: "/usr/bin/azcopy"
+    shouldExist: true
+    isExecutableBy: "any"
+    uid: 1000
+    gid: 1000
+  - name: "az"
+    path: "/usr/bin/az"
+    shouldExist: true
+    isExecutableBy: "any"
+    uid: 0
+    gid: 0
+  - name: "geoipupdate"
+    path: "/usr/bin/geoipupdate"
+    shouldExist: true
+    isExecutableBy: "any"
+    uid: 1000
+    gid: 1000
+  - name: "Entrypoint script"
+    path: "/usr/bin/entrypoint.sh"
+    shouldExist: true
+    isExecutableBy: "any"
+    uid: 0
+    gid: 0
+  - name: "get-fileshare-signed-url.sh"
+    path: "/usr/bin/get-fileshare-signed-url.sh"
+    shouldExist: true
+    isExecutableBy: "any"
+    uid: 0
+    gid: 0
 commandTests:
   - name: "Check azcopy Version"
     command: "azcopy"
