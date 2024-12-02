@@ -1,0 +1,61 @@
+---
+name: Bump `azure-cli` version
+
+scms:
+  default:
+    kind: github
+    spec:
+      user: "{{ .github.user }}"
+      email: "{{ .github.email }}"
+      owner: "{{ .github.owner }}"
+      repository: "{{ .github.repository }}"
+      token: "{{ requiredEnv .github.token }}"
+      username: "{{ .github.username }}"
+      branch: "{{ .github.branch }}"
+
+sources:
+  latestVersion:
+    kind: githubrelease
+    name: Get the latest `azure-cli` version
+    spec:
+      owner: "Azure"
+      repository: "azure-cli"
+      token: "{{ requiredEnv .github.token }}"
+      username: "{{ .github.username }}"
+      typefilter:
+        latest: true
+    transformers:
+      - trimprefix: 'azure-cli-'
+
+targets:
+  updateDockerfileVersion:
+    name: Update the value of ARG AZ_VERSION in the Dockerfile
+    sourceid: latestVersion
+    kind: dockerfile
+    spec:
+      file: ./Dockerfile
+      instruction:
+        keyword: ARG
+        matcher: AZ_VERSION
+    scmid: default
+  updateCstVersion:
+    name: Update test harness with new `az` version
+    sourceid: latestVersion
+    kind: yaml
+    spec:
+      file: ./cst.yaml
+      key: $.commandTests[2].expectedOutput[0]
+    transformers:
+      - addprefix: '"azure-cli                         '
+      - addsuffix: '"'
+    scmid: default
+
+actions:
+  default:
+    kind: github/pullrequest
+    title: Bump `azure-cli` version to {{ source "latestVersion" }}
+    scmid: default
+    spec:
+      labels:
+        - enhancement
+        - azure-cli

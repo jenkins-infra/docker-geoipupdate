@@ -1,0 +1,58 @@
+---
+name: Bump `azcopy`version`
+
+scms:
+  default:
+    kind: github
+    spec:
+      user: "{{ .github.user }}"
+      email: "{{ .github.email }}"
+      owner: "{{ .github.owner }}"
+      repository: "{{ .github.repository }}"
+      token: "{{ requiredEnv .github.token }}"
+      username: "{{ .github.username }}"
+      branch: "{{ .github.branch }}"
+
+sources:
+  latestVersion:
+    kind: shell
+    name: Get the latest `azcopy` (full) version
+    spec:
+      command: bash -c 'basename "$(dirname "$(curl https://aka.ms/downloadazcopy-v10-linux --write-out "%{redirect_url}" --output /dev/null --silent --fail --show-error)" )"'
+    transformers:
+      - trimprefix: 'release-'
+
+targets:
+  updateDockerfileVersion:
+    name: Update the value of ARG AZCOPY_VERSION in the Dockerfile
+    sourceid: latestVersion
+    kind: dockerfile
+    spec:
+      file: ./Dockerfile
+      instruction:
+        keyword: ARG
+        matcher: AZCOPY_VERSION
+    scmid: default
+  updateCstVersion:
+    name: Update test harness with new `azcopy` version
+    sourceid: latestVersion
+    kind: yaml
+    spec:
+      file: ./cst.yaml
+      key: $.commandTests[0].expectedOutput[0]
+    transformers:
+      - findsubmatch:
+          pattern: "(.*)-(.*)"
+          captureindex: 1
+      - addprefix: '"azcopy version '
+      - addsuffix: '"'
+    scmid: default
+
+actions:
+  default:
+    kind: github/pullrequest
+    scmid: default
+    title: Bump `azcopy` version to {{ source "latestVersion" }}
+    spec:
+      labels:
+        - dependencies
