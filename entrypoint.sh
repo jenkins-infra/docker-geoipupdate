@@ -40,13 +40,13 @@ fi
 
 ### GEOUPDATEIP
 echo "LAUNCH GEOIP UPDATE"
-if [ "${GEOIPUPDATE_DRYRUN-default}" == "default" ]; then #if GEOIPUPDATE_DRYRUN is not set
-    /usr/bin/geoipupdate --verbose --output --database-directory="${GEOIPUPDATE_DB_DIR}"
+if [ "${GEOIPUPDATE_DRYRUN:-false}" != "true" ]; then
+    geoipupdate --verbose --output --database-directory="${GEOIPUPDATE_DB_DIR}"
 else
-    echo "DRY MODE ON" #if GEOIPUPDATE_DRYRUN is set
+    echo "DRY-RUN ON"
     [[ "$(uname  || true)" == "Darwin" ]] && dateCmd="gdate" || dateCmd="date"
     currentUTCdatetime="$("${dateCmd}" --utc +"%Y%m%dT%H%MZ")"
-    echo "drymode" >"${GEOIPUPDATE_DB_DIR}/dryrun-${currentUTCdatetime}.mmdb"
+    echo "dry-run" >"${GEOIPUPDATE_DB_DIR}/dryrun-${currentUTCdatetime}.mmdb"
 fi
 echo "UPDATE DONE"
 

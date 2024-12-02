@@ -31,7 +31,6 @@ RUN ARCH="$(uname -m)" && \
 && BIN_LOCATION="$(tar -tzf /tmp/azcopy.tgz | grep "/azcopy")" \
 && export BIN_LOCATION \
 && tar -xvzf /tmp/azcopy.tgz --strip-components=1 --directory=/usr/bin/ "$BIN_LOCATION" \
-&& chown "${user}:${user}" /usr/bin/azcopy \
 && chmod +x /usr/bin/azcopy
 
 # AZ INSTALL
@@ -58,12 +57,10 @@ RUN ARCH="$(uname -m)" && \
 && BIN_LOCATION=$(tar -tzf /tmp/geoipupdate.tgz | grep "/geoipupdate$") \
 && export BIN_LOCATION \
 && tar -xvzf /tmp/geoipupdate.tgz --strip-components=1 --directory=/usr/bin/ "$BIN_LOCATION" \
-&& chown "${user}:${user}" /usr/bin/geoipupdate \
 && chmod +x /usr/bin/geoipupdate
 
 USER "${user}"
 
-# TODO updatecli https://github.com/jenkins-infra/packer-images/blob/main/updatecli/updatecli.d/get-fileshare-signed-url.yml
 COPY get-fileshare-signed-url.sh /usr/bin/get-fileshare-signed-url.sh
 COPY entrypoint.sh /usr/bin/entrypoint.sh
 ENTRYPOINT ["/usr/bin/entrypoint.sh"]
