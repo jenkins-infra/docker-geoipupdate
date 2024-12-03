@@ -1,6 +1,6 @@
 ARG GEOIPUPDATE_VERSION=v7.0.1
 ARG AZCOPY_VERSION=10.26.0-20240731
-ARG AZ_VERSION=2.51.0
+ARG AZ_VERSION=2.67.0
 
 FROM ubuntu:22.04
 # hadolint ignore=DL3008
@@ -34,7 +34,7 @@ RUN ARCH="$(uname -m)" && \
 && chmod +x /usr/bin/azcopy
 
 # AZ INSTALL
-ARG AZ_VERSION
+ARG AZ_VERSION=2.67.0
 RUN mkdir -p /etc/apt/keyrings && \
     wget --quiet --output-document - "https://packages.microsoft.com/keys/microsoft.asc" | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null && \
     chmod go+r /etc/apt/keyrings/microsoft.gpg && \
