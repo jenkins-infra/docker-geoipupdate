@@ -4,6 +4,7 @@ set -Eeu -o pipefail
 
 GEOIPUPDATE_DB_DIR="$(mktemp -d)"
 export GEOIPUPDATE_DB_DIR
+export GEOIPUPDATE_FREQUENCY=0
 
 if [ -z "$GEOIPUPDATE_ACCOUNT_ID" ] && [ -z  "$GEOIPUPDATE_ACCOUNT_ID_FILE" ]; then
     echo "ERROR: You must set the environment variable GEOIPUPDATE_ACCOUNT_ID or GEOIPUPDATE_ACCOUNT_ID_FILE!"
@@ -17,10 +18,6 @@ fi
 
 if [ -z "$GEOIPUPDATE_EDITION_IDS" ]; then
     GEOIPUPDATE_EDITION_IDS="GeoLite2-ASN GeoLite2-City GeoLite2-Country"
-fi
-
-if [ -z "$GEOIPUPDATE_FREQUENCY" ]; then
-    GEOIPUPDATE_FREQUENCY=0
 fi
 
 if [ -z "$JENKINS_INFRA_FILESHARE_CLIENT_ID" ]; then
