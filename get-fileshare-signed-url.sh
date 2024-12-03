@@ -55,7 +55,6 @@ fi
 [[ "$(uname  || true)" == "Darwin" ]] && dateCmd="gdate" || dateCmd="date"
 expiry="$("${dateCmd}" --utc --date "+ ${STORAGE_DURATION_IN_MINUTE} minutes" +"%Y-%m-%dT%H:%MZ")"
 
-
 # Generate a SAS token, remove double quotes around it and replace potential '/' by '%2F'
 token="$(az storage share generate-sas "${accountKeyArg[@]}" \
 --name "${STORAGE_FILESHARE}" \
