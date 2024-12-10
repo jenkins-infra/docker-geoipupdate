@@ -1,10 +1,11 @@
 ARG GEOIPUPDATE_VERSION=v7.0.1
 ARG AZCOPY_VERSION=10.26.0-20240731
 ARG AZ_VERSION=2.51.0
+ARG KUBECTL_VERSION=1.26.12
 
 FROM ubuntu:22.04
 # hadolint ignore=DL3008
-RUN apt-get update && apt-get install -y --no-install-recommends wget ca-certificates gnupg lsb-release\
+RUN apt-get update && apt-get install -y --no-install-recommends jq wget ca-certificates gnupg lsb-release\
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -58,6 +59,20 @@ RUN ARCH="$(uname -m)" && \
 && export BIN_LOCATION \
 && tar -xvzf /tmp/geoipupdate.tgz --strip-components=1 --directory=/usr/bin/ "$BIN_LOCATION" \
 && chmod +x /usr/bin/geoipupdate
+
+# kubectl install
+ARG KUBECTL_VERSION
+RUN ARCH="$(uname -m)" && \
+    if [ "$ARCH" = "x86_64" ]; then \
+        DOWNLOAD_URL="https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl"; \
+    elif [ "$ARCH" = "aarch64" ]; then \
+    DOWNLOAD_URL="https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/arm64/kubectl"; \
+    else \
+        echo "Unsupported architecture: $ARCH" && exit 1; \
+    fi \
+    && wget "${DOWNLOAD_URL}" --quiet --output-document=/usr/local/bin/kubectl \
+    && chmod +x /usr/local/bin/kubectl \
+    && kubectl version --client --output=yaml 2>&1 | grep -q "${KUBECTL_VERSION}"
 
 USER "${user}"
 
