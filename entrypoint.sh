@@ -5,7 +5,6 @@ echo "----------------------- Start "
 date
 
 GEOIPUPDATE_DB_DIR="$(mktemp -d)"
-# GEOIPUPDATE_DB_DIR="/tmp/TESTS"
 export GEOIPUPDATE_DB_DIR
 export GEOIPUPDATE_FREQUENCY=0
 
@@ -121,15 +120,28 @@ if jq -e '.[] | select(.old_hash != .new_hash)' "${GEOIPUPDATEJSONDIR}/geoipupda
         "${fileShareSignedUrl}"
     echo "AZCOPY local to dest done"
 
-    echo "ROLLOUT RESTART"
-        kubectl -n updates-jenkins-io   rollout restart deployment updates-jenkins-io-content-secured-mirrorbits &&
-        kubectl -n updates-jenkins-io   rollout status  deployment updates-jenkins-io-content-secured-mirrorbits
-        kubectl -n updates-jenkins-io   rollout restart deployment updates-jenkins-io-content-unsecured-mirrorbits &&
-        kubectl -n updates-jenkins-io   rollout status  deployment updates-jenkins-io-content-unsecured-mirrorbits
-        kubectl -n get-jenkins-io       rollout restart deployment get-jenkins-io-mirrorbits &&
-        kubectl -n get-jenkins-io       rollout status  deployment get-jenkins-io-mirrorbits
-    echo "ROLLOUT RESTART DONE"
-    
+    if [ "${GEOIPUPDATE_ROLLOUT:-false}" != "false" ]; then
+        echo "ROLLOUT RESTART"
+        # Backup IFS
+        OLDIFS=${IFS}
+        # Split the entries by ";"
+        IFS=';' read -ra entries <<< "${GEOIPUPDATE_ROLLOUT}"
+        # Loop through the entries
+        for entry in "${entries[@]}"; do
+            # Split namespace and deployments by ":"
+            IFS=':' read -r namespace deployments <<< "${entry}"
+            # Split deployments by "," and loop through each
+            IFS=',' read -ra deployment_list <<< "${deployments}"
+            for deployment in "${deployment_list[@]}"; do
+                # ROLLOUT RESTART and ROLLOUT STATUS
+                echo kubectl -n "${namespace}" rollout restart deployment "${deployment}" && kubectl -n "${namespace}" rollout status deployment "${deployment}"
+                kubectl -n "${namespace}" rollout restart deployment "${deployment}" && kubectl -n "${namespace}" rollout status deployment "${deployment}"
+            done
+        done
+        # Restore IFS
+        IFS=${OLDIFS}
+        echo "ROLLOUT RESTART DONE"
+    fi
 else
     echo "Data are up to date"
 fi
