@@ -41,7 +41,7 @@ commandTests:
   - name: "Check geoipupdate Version"
     command: "geoipupdate"
     args: ["--version"]
-    expectedError: ["geoipupdate 7.0.1"]
+    expectedError: ["geoipupdate 7.1.0"]
   - name: "Check az Version"
     command: "az"
     args: ["--version"]
