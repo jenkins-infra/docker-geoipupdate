@@ -1,4 +1,4 @@
-ARG GEOIPUPDATE_VERSION=v7.0.1
+ARG GEOIPUPDATE_VERSION=v7.1.0
 ARG AZCOPY_VERSION=10.26.0-20240731
 ARG AZ_VERSION=2.51.0
 ARG KUBECTL_VERSION=1.26.12
@@ -44,7 +44,7 @@ RUN mkdir -p /etc/apt/keyrings && \
     apt-get update && apt-get install -y --no-install-recommends azure-cli="${AZ_VERSION}-1~${AZ_DIST}" && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # GEOIPUPDATE INSTALL
-ARG GEOIPUPDATE_VERSION
+ARG GEOIPUPDATE_VERSION=v7.1.0
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN ARCH="$(uname -m)" && \
     if [ "$ARCH" = "x86_64" ]; then \
