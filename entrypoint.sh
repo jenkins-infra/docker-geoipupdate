@@ -84,7 +84,7 @@ echo "LAUNCH GEOIPUPDATE"
 GEOIPUPDATEJSONDIR="$(mktemp -d)"
 export GEOIPUPDATEJSONDIR
 if [ "${GEOIPUPDATE_DRYRUN:-false}" != "true" ]; then
-    geoipupdate --verbose --output "${GEOIPUPDATEJSONDIR}/geoipupdate.json" --database-directory="${GEOIPUPDATE_DB_DIR}"
+    geoipupdate --verbose --output="${GEOIPUPDATEJSONDIR}/geoipupdate.json" --database-directory="${GEOIPUPDATE_DB_DIR}"
 else
     echo "DRY-RUN ON"
     [[ "$(uname  || true)" == "Darwin" ]] && dateCmd="gdate" || dateCmd="date"
