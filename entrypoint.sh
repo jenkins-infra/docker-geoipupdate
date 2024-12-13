@@ -95,7 +95,7 @@ else
     echo "json saved to file ${GEOIPUPDATEJSONPATH}"
 fi
 jq -r . "${GEOIPUPDATEJSONPATH}" # check that the file exist and has valid json content.
-jq 'has("old_hash") and has("new_hash")' "${GEOIPUPDATEJSONPATH}"
+# jq 'has("old_hash") and has("new_hash")' "${GEOIPUPDATEJSONPATH}"
 echo "GEOIPUPDATE DONE"
 
 ### PARSING JSON copy if hash have changed
