@@ -81,25 +81,25 @@ ls -lt "${GEOIPUPDATE_DB_DIR}"
 
 ### GEOUPDATEIP
 echo "LAUNCH GEOIPUPDATE"
-GEOIPUPDATEJSONDIR="$(mktemp -d)"
-export GEOIPUPDATEJSONDIR
+GEOIPUPDATEJSONPATH="$(mktemp)"
 if [ "${GEOIPUPDATE_DRYRUN:-false}" != "true" ]; then
-    geoipupdate --verbose --output "${GEOIPUPDATEJSONDIR}/geoipupdate.json" --database-directory="${GEOIPUPDATE_DB_DIR}"
+    geoipupdate --output --database-directory="${GEOIPUPDATE_DB_DIR}" > "${GEOIPUPDATEJSONPATH}"
 else
     echo "DRY-RUN ON"
     [[ "$(uname  || true)" == "Darwin" ]] && dateCmd="gdate" || dateCmd="date"
     currentUTCdatetime="$("${dateCmd}" --utc +"%Y%m%dT%H%MZ")"
     echo "dry-run" >"${GEOIPUPDATE_DB_DIR}/dryrun-${currentUTCdatetime}.mmdb"
-    echo '[{"edition_id":"GeoLite2-ASN","old_hash":"c54b6e64478adfd010c7a86db310033f","new_hash":"857a0cf8118b9961cf6789e1842bce2a","modified_at":1733403617,"checked_at":1733756616},{"edition_id":"GeoLite2-City","old_hash":"34a6a0ec4018c74a503134980c154502","new_hash":"fb3449d8252f74eac39fc55c32c19879","modified_at":1733501742,"checked_at":1733756620},{"edition_id":"GeoLite2-Country","old_hash":"627a1d220b5ef844e0f0f174a0161cd7","new_hash":"27b1f57ae9dd56e1923f5d458514794c","modified_at":1733506208,"checked_at":1733756621}]' > "${GEOIPUPDATEJSONDIR}/geoipupdate.json"
-    # echo '[{"edition_id":"GeoLite2-ASN","old_hash":"857a0cf8118b9961cf6789e1842bce2a","new_hash":"857a0cf8118b9961cf6789e1842bce2a","checked_at":1733760216},{"edition_id":"GeoLite2-City","old_hash":"fb3449d8252f74eac39fc55c32c19879","new_hash":"fb3449d8252f74eac39fc55c32c19879","checked_at":1733760216},{"edition_id":"GeoLite2-Country","old_hash":"27b1f57ae9dd56e1923f5d458514794c","new_hash":"27b1f57ae9dd56e1923f5d458514794c","checked_at":1733760216}]' > "${GEOIPUPDATEJSONDIR}/geoipupdate.json"
-    echo "json saved to file ${GEOIPUPDATEJSONDIR}/geoipupdate.json"
-    cat "${GEOIPUPDATEJSONDIR}/geoipupdate.json"
+    echo '[{"edition_id":"GeoLite2-ASN","old_hash":"c54b6e64478adfd010c7a86db310033f","new_hash":"857a0cf8118b9961cf6789e1842bce2a","modified_at":1733403617,"checked_at":1733756616},{"edition_id":"GeoLite2-City","old_hash":"34a6a0ec4018c74a503134980c154502","new_hash":"fb3449d8252f74eac39fc55c32c19879","modified_at":1733501742,"checked_at":1733756620},{"edition_id":"GeoLite2-Country","old_hash":"627a1d220b5ef844e0f0f174a0161cd7","new_hash":"27b1f57ae9dd56e1923f5d458514794c","modified_at":1733506208,"checked_at":1733756621}]' > "${GEOIPUPDATEJSONPATH}"
+    ## Use this version to test, in dry run, the case of "not changed data"
+    # echo '[{"edition_id":"GeoLite2-ASN","old_hash":"857a0cf8118b9961cf6789e1842bce2a","new_hash":"857a0cf8118b9961cf6789e1842bce2a","checked_at":1733760216},{"edition_id":"GeoLite2-City","old_hash":"fb3449d8252f74eac39fc55c32c19879","new_hash":"fb3449d8252f74eac39fc55c32c19879","checked_at":1733760216},{"edition_id":"GeoLite2-Country","old_hash":"27b1f57ae9dd56e1923f5d458514794c","new_hash":"27b1f57ae9dd56e1923f5d458514794c","checked_at":1733760216}]' > "${GEOIPUPDATEJSONPATH}"
+    echo "json saved to file ${GEOIPUPDATEJSONPATH}"
 fi
+jq -r . "${GEOIPUPDATEJSONPATH}" # check that the file exist and has valid json content.
 echo "GEOIPUPDATE DONE"
 
 ### PARSING JSON copy if hash have changed
 # > /dev/null to avoid multiple true in output but keep errors output
-if jq -e '.[] | select(.old_hash != .new_hash)' "${GEOIPUPDATEJSONDIR}/geoipupdate.json" > /dev/null; then
+if jq -e '.[] | select(.old_hash != .new_hash)' "${GEOIPUPDATEJSONPATH}" > /dev/null; then
     echo "DATA CHANGED, update needed"
     ### AZCOPY local to dest
     echo "LAUNCH AZCOPY local to dest"
