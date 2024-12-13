@@ -1,5 +1,5 @@
 ARG GEOIPUPDATE_VERSION=v7.1.0
-ARG AZCOPY_VERSION=10.26.0-20240731
+ARG AZCOPY_VERSION=10.27.1-20241113
 ARG AZ_VERSION=2.51.0
 ARG KUBECTL_VERSION=1.26.12
 
@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends jq wget ca-cert
     && rm -rf /var/lib/apt/lists/*
 
 # AZCOPY INSTALL
-ARG AZCOPY_VERSION
+ARG AZCOPY_VERSION=10.27.1-20241113
 ARG user=azcopy
 ARG group=azcopy
 ARG uid=1000
