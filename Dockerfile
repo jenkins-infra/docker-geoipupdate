@@ -11,10 +11,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends jq wget ca-cert
 
 # AZCOPY INSTALL
 ARG AZCOPY_VERSION=10.27.1
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN rep_config_pkg="$(mktemp)" \
     # Download and install the repository configuration package.
-    && curl --silent --show-error --location --output "${rep_config_pkg}" \
-    https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb \
+    && wget -qO- "https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb" -O "${rep_config_pkg}" \
     && dpkg --install "${rep_config_pkg}" \
     && rm -f "${rep_config_pkg}" \
     && apt-get update --quiet \
@@ -27,6 +27,7 @@ RUN rep_config_pkg="$(mktemp)" \
 
 # AZ INSTALL
 ARG AZ_VERSION=2.67.0
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN mkdir -p /etc/apt/keyrings && \
     wget --quiet --output-document - "https://packages.microsoft.com/keys/microsoft.asc" | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null && \
     chmod go+r /etc/apt/keyrings/microsoft.gpg && \
@@ -53,6 +54,7 @@ RUN ARCH="$(uname -m)" && \
 
 # kubectl install
 ARG KUBECTL_VERSION
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN ARCH="$(uname -m)" && \
     if [ "$ARCH" = "x86_64" ]; then \
         DOWNLOAD_URL="https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl"; \
