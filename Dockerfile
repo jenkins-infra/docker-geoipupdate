@@ -1,5 +1,5 @@
 ARG GEOIPUPDATE_VERSION=v7.1.0
-ARG AZCOPY_VERSION=10.27.1-20241113
+ARG AZCOPY_VERSION=10.27.1
 ARG AZ_VERSION=2.67.0
 ARG KUBECTL_VERSION=1.26.12
 
@@ -10,29 +10,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends jq wget ca-cert
     && rm -rf /var/lib/apt/lists/*
 
 # AZCOPY INSTALL
-ARG AZCOPY_VERSION=10.27.1-20241113
-ARG user=azcopy
-ARG group=azcopy
-ARG uid=1000
-ARG gid=1000
-ARG user_home="/home/${user}"
-RUN groupadd -g ${gid} ${group} \
-    && useradd -l -d "${user_home}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
-
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN ARCH="$(uname -m)" && \
-    if [ "$ARCH" = "x86_64" ]; then \
-        DOWNLOAD_URL="https://azcopyvnext.azureedge.net/releases/release-${AZCOPY_VERSION}/azcopy_linux_amd64_${AZCOPY_VERSION%%-*}.tar.gz"; \
-    elif [ "$ARCH" = "aarch64" ]; then \
-        DOWNLOAD_URL="https://azcopyvnext.azureedge.net/releases/release-${AZCOPY_VERSION}/azcopy_linux_arm64_${AZCOPY_VERSION%%-*}.tar.gz"; \
-    else \
-        echo "Unsupported architecture: $ARCH" && exit 1; \
-    fi \
-&& wget --quiet --output-document - "${DOWNLOAD_URL}" -O /tmp/azcopy.tgz \
-&& BIN_LOCATION="$(tar -tzf /tmp/azcopy.tgz | grep "/azcopy")" \
-&& export BIN_LOCATION \
-&& tar -xvzf /tmp/azcopy.tgz --strip-components=1 --directory=/usr/bin/ "$BIN_LOCATION" \
-&& chmod +x /usr/bin/azcopy
+ARG AZCOPY_VERSION=10.27.1
+RUN rep_config_pkg="$(mktemp)" \
+    # Download and install the repository configuration package.
+    && curl --silent --show-error --location --output "${rep_config_pkg}" \
+    https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb \
+    && dpkg --install "${rep_config_pkg}" \
+    && rm -f "${rep_config_pkg}" \
+    && apt-get update --quiet \
+    && apt-get install --yes --no-install-recommends azcopy="${AZCOPY_VERSION}" \
+    # Sanity check
+    && azcopy --version \
+    # Cleanup
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # AZ INSTALL
 ARG AZ_VERSION=2.67.0
