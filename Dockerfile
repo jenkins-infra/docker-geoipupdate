@@ -9,6 +9,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends jq wget ca-cert
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# User and Group
+ARG user=azcopy
+ARG group=azcopy
+ARG uid=1000
+ARG gid=1000
+ARG user_home="/home/${user}"
+RUN groupadd -g ${gid} ${group} \
+    && useradd -l -d "${user_home}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
 # AZCOPY INSTALL
 ARG AZCOPY_VERSION=10.27.1
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
