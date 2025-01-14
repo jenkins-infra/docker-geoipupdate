@@ -22,6 +22,8 @@ sources:
       repository: azure-storage-azcopy
       token: "{{ requiredEnv .github.token }}"
       username: "{{ .github.username }}"
+    transformers:
+      - trimprefix: 'v'
 
 targets:
   updateDockerfileVersion:
@@ -42,7 +44,6 @@ targets:
       file: ./cst.yaml
       key: $.commandTests[0].expectedOutput[0]
     transformers:
-      - trimprefix: 'v'
       - addprefix: '"azcopy version '
       - addsuffix: '"'
     scmid: default

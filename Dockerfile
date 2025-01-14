@@ -4,12 +4,14 @@ ARG AZ_VERSION=2.67.0
 ARG KUBECTL_VERSION=1.26.12
 
 FROM ubuntu:22.04
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends jq wget ca-certificates gnupg lsb-release\
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# User and Group
 ARG user=azcopy
 ARG group=azcopy
 ARG uid=1000
@@ -18,9 +20,7 @@ ARG user_home="/home/${user}"
 RUN groupadd -g ${gid} ${group} \
     && useradd -l -d "${user_home}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
 
-# AZCOPY INSTALL
 ARG AZCOPY_VERSION=10.27.1
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN rep_config_pkg="$(mktemp)" \
     # Download and install the repository configuration package.
     && wget -qO- "https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb" -O "${rep_config_pkg}" \
@@ -34,9 +34,7 @@ RUN rep_config_pkg="$(mktemp)" \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# AZ INSTALL
 ARG AZ_VERSION=2.67.0
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN mkdir -p /etc/apt/keyrings && \
     wget --quiet --output-document - "https://packages.microsoft.com/keys/microsoft.asc" | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null && \
     chmod go+r /etc/apt/keyrings/microsoft.gpg && \
@@ -44,9 +42,7 @@ RUN mkdir -p /etc/apt/keyrings && \
     printf 'Types: deb\nURIs: https://packages.microsoft.com/repos/azure-cli/\nSuites: %s\nComponents: main\nArchitectures: %s\nSigned-by: /etc/apt/keyrings/microsoft.gpg' "${AZ_DIST}" "$(dpkg --print-architecture)" | tee /etc/apt/sources.list.d/azure-cli.sources && \
     apt-get update && apt-get install -y --no-install-recommends azure-cli="${AZ_VERSION}-1~${AZ_DIST}" && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# GEOIPUPDATE INSTALL
 ARG GEOIPUPDATE_VERSION=v7.1.0
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN ARCH="$(uname -m)" && \
     if [ "$ARCH" = "x86_64" ]; then \
         DOWNLOAD_URL="https://github.com/maxmind/geoipupdate/releases/download/${GEOIPUPDATE_VERSION}/geoipupdate_${GEOIPUPDATE_VERSION#v}_linux_amd64.tar.gz"; \
@@ -61,9 +57,7 @@ RUN ARCH="$(uname -m)" && \
 && tar -xvzf /tmp/geoipupdate.tgz --strip-components=1 --directory=/usr/bin/ "$BIN_LOCATION" \
 && chmod +x /usr/bin/geoipupdate
 
-# kubectl install
 ARG KUBECTL_VERSION
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN ARCH="$(uname -m)" && \
     if [ "$ARCH" = "x86_64" ]; then \
         DOWNLOAD_URL="https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl"; \
