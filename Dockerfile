@@ -1,6 +1,6 @@
 ARG GEOIPUPDATE_VERSION=v7.1.0
 ARG AZCOPY_VERSION=10.29.1
-ARG AZ_VERSION=2.74.0
+ARG AZ_VERSION=2.75.0
 ARG KUBECTL_VERSION=1.26.12
 
 FROM ubuntu:22.04
@@ -34,7 +34,7 @@ RUN rep_config_pkg="$(mktemp)" \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ARG AZ_VERSION=2.74.0
+ARG AZ_VERSION=2.75.0
 RUN mkdir -p /etc/apt/keyrings && \
     wget --quiet --output-document - "https://packages.microsoft.com/keys/microsoft.asc" | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null && \
     chmod go+r /etc/apt/keyrings/microsoft.gpg && \
