@@ -1,4 +1,4 @@
-ARG GEOIPUPDATE_VERSION=v7.1.0
+ARG GEOIPUPDATE_VERSION=v7.1.1
 ARG AZCOPY_VERSION=10.29.1
 ARG AZ_VERSION=2.75.0
 ARG KUBECTL_VERSION=1.26.12
@@ -42,7 +42,7 @@ RUN mkdir -p /etc/apt/keyrings && \
     printf 'Types: deb\nURIs: https://packages.microsoft.com/repos/azure-cli/\nSuites: %s\nComponents: main\nArchitectures: %s\nSigned-by: /etc/apt/keyrings/microsoft.gpg' "${AZ_DIST}" "$(dpkg --print-architecture)" | tee /etc/apt/sources.list.d/azure-cli.sources && \
     apt-get update && apt-get install -y --no-install-recommends azure-cli="${AZ_VERSION}-1~${AZ_DIST}" && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ARG GEOIPUPDATE_VERSION=v7.1.0
+ARG GEOIPUPDATE_VERSION=v7.1.1
 RUN ARCH="$(uname -m)" && \
     if [ "$ARCH" = "x86_64" ]; then \
         DOWNLOAD_URL="https://github.com/maxmind/geoipupdate/releases/download/${GEOIPUPDATE_VERSION}/geoipupdate_${GEOIPUPDATE_VERSION#v}_linux_amd64.tar.gz"; \
