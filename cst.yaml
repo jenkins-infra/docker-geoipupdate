@@ -37,7 +37,7 @@ commandTests:
   - name: "Check azcopy Version"
     command: "azcopy"
     args: ["--version"]
-    expectedOutput: ["\"azcopy version 10.30.1\""]
+    expectedOutput: ["\"azcopy version 10.31.0\""]
   - name: "Check geoipupdate Version"
     command: "geoipupdate"
     args: ["--version"]
