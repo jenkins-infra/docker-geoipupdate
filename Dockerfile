@@ -1,5 +1,5 @@
 ARG GEOIPUPDATE_VERSION=v7.1.1
-ARG AZCOPY_VERSION=10.31.0
+ARG AZCOPY_VERSION=10.31.1
 ARG AZ_VERSION=2.79.0
 ARG KUBECTL_VERSION=1.26.12
 
@@ -20,7 +20,7 @@ ARG user_home="/home/${user}"
 RUN groupadd -g ${gid} ${group} \
     && useradd -l -d "${user_home}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
 
-ARG AZCOPY_VERSION=10.31.0
+ARG AZCOPY_VERSION=10.31.1
 RUN rep_config_pkg="$(mktemp)" \
     # Download and install the repository configuration package.
     && wget -qO- "https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb" -O "${rep_config_pkg}" \
